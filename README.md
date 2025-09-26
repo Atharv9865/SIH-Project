@@ -1,71 +1,123 @@
-# Waste Management Application
+# Swachhata Sentinel - Production Deployment
 
-A web application for tracking and managing waste collection, recycling, and reporting.
+This document outlines the production deployment setup for the Swachhata Sentinel application with real-time functionality.
 
-## Setup Instructions
+## Quick Start
+
+```bash
+# Initialize your project
+git clone your-repo-url
+cd swachhata-sentinel
+pip install -r requirements.txt
+
+# Run the application (development mode)
+python start.py
+
+# Run the application (production mode)
+python start.py --mode production
+
+# Start only specific components
+python app.py                                  # Backend server
+celery -A ml.image_processor worker --loglevel=info  # Image processing worker
+```
+
+### Access URLs
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **Admin Dashboard**: http://localhost:8000/admin
+
+## Architecture Overview
+
+The application uses a modern stack designed for real-time processing and spatial data:
+
+- **Backend**: FastAPI with WebSocket support
+- **Database**: PostgreSQL with PostGIS for spatial queries
+- **Caching/Messaging**: Redis for WebSocket connections and Pub/Sub
+- **Async Processing**: Celery for image analysis
+- **Frontend**: React.js with PWA capabilities
+
+## Deployment Instructions
 
 ### Prerequisites
 
-1. **Node.js**
-   - Download and install from [nodejs.org](https://nodejs.org/)
+- Docker and Docker Compose
+- 4GB+ RAM recommended
+- 10GB+ disk space
 
-2. **Git**
-   - Download and install from [git-scm.com](https://git-scm.com/)
+### Environment Setup
 
-3. **VS Code (Recommended)**
-   - Download and install from [code.visualstudio.com](https://code.visualstudio.com/)
-   - Recommended extensions:
-     - Live Server
-     - Prettier
-     - ES6 Lint
-     - Auto Rename Tag
-     - Thunder Client
+1. Clone the repository
+2. Configure environment variables in `.env` files (backend and frontend)
+3. Ensure the ML model is placed in the `/models` directory
 
-### Installation
+### Deployment Steps
 
-1. Clone the repository (if using Git):
-   ```
-   git clone <repository-url>
-   cd waste-management-app
-   ```
+```bash
+# Build and start all services
+docker-compose up -d
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
+# Monitor logs
+docker-compose logs -f
 
-3. Start the server:
-   ```
-   npm start
-   ```
-   
-   For development with auto-reload:
-   ```
-   npm run dev
-   ```
+# Scale workers if needed
+docker-compose up -d --scale celery_worker=3
+```
 
-4. Access the application:
-   - Open your browser and navigate to `http://localhost:3000`
+### Accessing the Application
 
-## Project Structure
+- **Frontend**: http://localhost
+- **API**: http://localhost/api
+- **Health Check**: http://localhost/health
 
-- `/frontend` - Contains all client-side code
-  - `index.html` - Main HTML file
-  - `styles.css` - CSS styles
-  - `app.js` - Frontend JavaScript
+## Key Features
 
-- `/backend` - Contains server-side code
-  - `server.js` - Express server and API endpoints
+### Real-time Infrastructure
 
-## Features
+- **WebSocket Server**: Provides live updates to connected clients
+- **Redis Pub/Sub**: Broadcasts zone changes to all services
+- **Background Workers**: Process images asynchronously
 
-- Dashboard with waste collection statistics
-- Collection schedule management
-- Recycling tracking
-- Reporting system
+### Offline Capabilities
 
-## Development
+The frontend includes PWA features for offline functionality:
+- Service workers for caching
+- IndexedDB for local storage
+- Background sync for uploads
 
-To modify the frontend only, you can use the Live Server extension in VS Code to serve the frontend directory.
+## Monitoring and Maintenance
 
-For full-stack development with API functionality, run the Node.js server using `npm run dev`.
+### Health Checks
+
+- API endpoint: `/health`
+- Database connection status
+- Redis connection status
+
+### Scaling
+
+The application can be scaled horizontally:
+- API servers can be load-balanced
+- Celery workers can be scaled independently
+- Redis can be configured for clustering
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Errors**
+   - Check PostgreSQL container logs
+   - Verify environment variables
+
+2. **WebSocket Connection Issues**
+   - Check NGINX configuration
+   - Verify proxy settings
+
+3. **Image Processing Failures**
+   - Check Celery worker logs
+   - Verify ML model path
+
+## Security Considerations
+
+- All services run in isolated containers
+- Environment variables for sensitive information
+- NGINX configured for proper headers
+- No secrets in code repositories

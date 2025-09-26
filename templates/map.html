@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swachhata Sentinel - Waste Management Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            padding: 1rem;
+        }
+        #map-container {
+            flex: 3;
+            height: calc(100vh - 120px);
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #sidebar {
+            flex: 1;
+            margin-left: 1rem;
+            padding: 1rem;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 300px;
+            overflow-y: auto;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        #dropArea {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            padding: 25px;
+            text-align: center;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+        #dropArea.highlight {
+            border-color: #4CAF50;
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+        #previewContainer {
+            display: none;
+            margin-top: 15px;
+        }
+        #previewImage {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 5px;
+        }
+        .location-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .location-item:hover {
+            background-color: #f0f0f0;
+        }
+        .waste-category {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+        .waste-category.plastic {
+            background-color: #ff9800;
+            color: white;
+        }
+        .waste-category.organic {
+            background-color: #8bc34a;
+            color: white;
+        }
+        .waste-category.mixed {
+            background-color: #9c27b0;
+            color: white;
+        }
+        .waste-category.recyclable {
+            background-color: #2196f3;
+            color: white;
+        }
+        .waste-category.hazardous {
+            background-color: #f44336;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            main {
+                flex-direction: column;
+            }
+            #sidebar {
+                margin-left: 0;
+                margin-top: 1rem;
+                max-width: 100%;
+            }
+            #map-container {
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Swachhata Sentinel</div>
+        <div>
+            <button id="reportBtn" class="btn">Report Waste</button>
+            <button id="demoBtn" class="btn">Demo Mode</button>
+        </div>
+    </header>
+    
+    <main>
+        <div id="map-container">
+            <div id="map"></div>
+        </div>
+        
+        <div id="sidebar">
+            <h2>Waste Locations</h2>
+            <div id="locationList"></div>
+        </div>
+    </main>
+    
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Report Waste</h2>
+            <div id="dropArea">
+                <p>Drag & drop a photo here or click to select</p>
+                <input type="file" id="photoInput" accept="image/*" style="display: none;">
+            </div>
+            <div id="previewContainer">
+                <img id="previewImage" src="" alt="Preview">
+            </div>
+            <div>
+                <h3>Location</h3>
+                <p id="locationStatus">Detecting your location...</p>
+                <div>
+                    <label for="latitudeInput">Latitude:</label>
+                    <input type="text" id="latitudeInput" placeholder="Latitude">
+                </div>
+                <div>
+                    <label for="longitudeInput">Longitude:</label>
+                    <input type="text" id="longitudeInput" placeholder="Longitude">
+                </div>
+            </div>
+            <button id="submitReport" class="btn">Submit Report</button>
+        </div>
+    </div>
+    
+    <!-- Photo Details Modal -->
+    <div id="photoDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Waste Details</h2>
+            <div id="photoDetails"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize map
+        let map;
+        let markers = [];
+        let zones = [];
+        
+        function initMap() {
+            map = L.map('map').setView([18.5204, 73.8567], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Load initial data
+            loadPhotos();
+            loadZones();
+        }
+        
+        function loadPhotos() {
+            fetch('/api/photos')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(photo => {
+                        addPhotoMarker(photo);
+                    });
+                })
+                .catch(error => console.error('Error loading photos:', error));
+        }
+        
+        function loadZones() {
+            fetch('/api/zones')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(zone => {
+                        addZoneToMap(zone);
+                    });
+                })
+                .catch(error => console.error('Error loading zones:', error));
+        }
+        
+        function addPhotoMarker(photo) {
+            const marker = L.marker([photo.latitude, photo.longitude])
+                .addTo(map)
+                .bindPopup(`
+                    <strong>Waste Category:</strong> ${photo.waste_category}<br>
+                    <strong>Severity:</strong> ${photo.severity_score}/10<br>
+                    <img src="${photo.image_path}" style="max-width: 100%; max-height: 150px;">
+                `);
+                
+            marker.photo = photo;
+            marker.on('click', function() {
+                showPhotoDetails(photo);
+            });
+            
+            markers.push(marker);
+            
+            // Add to sidebar list
+            addLocationToList(photo);
+        }
+        
+        function addZoneToMap(zone) {
+            const color = getZoneColor(zone.waste_level);
+            const circle = L.circle([zone.center_lat, zone.center_lng], {
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.2,
+                radius: zone.radius * 1000 // Convert to meters
+            }).addTo(map);
+            
+            circle.zone = zone;
+            zones.push(circle);
+        }
+        
+        function updateZoneOnMap(zone) {
+            // Remove existing zone if it exists
+            const existingZoneIndex = zones.findIndex(z => z.zone.id === zone.id);
+            if (existingZoneIndex !== -1) {
+                map.removeLayer(zones[existingZoneIndex]);
+                zones.splice(existingZoneIndex, 1);
+            }
+            
+            // Add updated zone
+            addZoneToMap(zone);
+        }
+        
+        function getZoneColor(wasteLevel) {
+            if (wasteLevel >= 7) return '#f44336'; // Red
+            if (wasteLevel >= 4) return '#ff9800'; // Orange
+            return '#4CAF50'; // Green
+        }
+        
+        function addLocationToList(photo) {
+            const locationList = document.getElementById('locationList');
+            const item = document.createElement('div');
+            item.className = 'location-item';
+            item.innerHTML = `
+                <span class="waste-category ${photo.waste_category}">${photo.waste_category}</span>
+                <p>Severity: ${photo.severity_score}/10</p>
+                <small>${new Date(photo.timestamp).toLocaleString()}</small>
+            `;
+            
+            item.addEventListener('click', function() {
+                map.setView([photo.latitude, photo.longitude], 16);
+                showPhotoDetails(photo);
+            });
+            
+            locationList.prepend(item);
+        }
+        
+        function showPhotoDetails(photo) {
+            const photoDetails = document.getElementById('photoDetails');
+            photoDetails.innerHTML = `
+                <img src="${photo.image_path}" style="max-width: 100%; border-radius: 5px; margin-bottom: 15px;">
+                <p><strong>Waste Category:</strong> ${photo.waste_category}</p>
+                <p><strong>Severity Score:</strong> ${photo.severity_score}/10</p>
+                <p><strong>Confidence:</strong> ${(photo.confidence * 100).toFixed(1)}%</p>
+                <p><strong>Location:</strong> ${photo.latitude.toFixed(6)}, ${photo.longitude.toFixed(6)}</p>
+                <p><strong>Reported:</strong> ${new Date(photo.timestamp).toLocaleString()}</p>
+            `;
+            
+            document.getElementById('photoDetailsModal').style.display = 'block';
+        }
+        
+        function getUserLocation() {
+            const locationStatus = document.getElementById('locationStatus');
+            
+            if (navigator.geolocation) {
+                locationStatus.textContent = 'Detecting your location...';
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        
+                        document.getElementById('latitudeInput').value = latitude;
+                        document.getElementById('longitudeInput').value = longitude;
+                        
+                        locationStatus.textContent = 'Location detected!';
+                        
+                        // Center map on user location
+                        map.setView([latitude, longitude], 16);
+                    },
+                    function(error) {
+                        console.error('Error getting location:', error);
+                        locationStatus.textContent = 'Could not detect location. Please enter manually.';
+                    }
+                );
+            } else {
+                locationStatus.textContent = 'Geolocation is not supported by your browser. Please enter location manually.';
+            }
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            
+            // Report button
+            document.getElementById('reportBtn').addEventListener('click', function() {
+                document.getElementById('reportModal').style.display = 'block';
+                getUserLocation();
+            });
+            
+            // Demo button
+            document.getElementById('demoBtn').addEventListener('click', function() {
+                alert('Demo mode activated! Simulating waste reports...');
+                // In a real implementation, this would trigger demo data generation
+            });
+            
+            // Close buttons
+            document.querySelectorAll('.close').forEach(function(closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+            
+            // Photo upload
+            const dropArea = document.getElementById('dropArea');
+            const photoInput = document.getElementById('photoInput');
+            
+            dropArea.addEventListener('click', function() {
+                photoInput.click();
+            });
+            
+            dropArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('highlight');
+            });
+            
+            dropArea.addEventListener('dragleave', function() {
+                this.classList.remove('highlight');
+            });
+            
+            dropArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('highlight');
+                
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    handlePhotoUpload(file);
+                }
+            });
+            
+            photoInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    handlePhotoUpload(this.files[0]);
+                }
+            });
+            
+            function handlePhotoUpload(file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('previewContainer').style.display = 'block';
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // Submit report
+            document.getElementById('submitReport').addEventListener('click', function() {
+                const photoInput = document.getElementById('photoInput');
+                const latitude = document.getElementById('latitudeInput').value;
+                const longitude = document.getElementById('longitudeInput').value;
+                
+                if (!photoInput.files.length) {
+                    alert('Please select a photo');
+                    return;
+                }
+                
+                if (!latitude || !longitude) {
+                    alert('Please provide location information');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('photo', photoInput.files[0]);
+                formData.append('latitude', latitude);
+                formData.append('longitude', longitude);
+                
+                fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Report submitted successfully!');
+                    document.getElementById('reportModal').style.display = 'none';
+                    
+                    // Reset form
+                    photoInput.value = '';
+                    document.getElementById('previewContainer').style.display = 'none';
+                    document.getElementById('latitudeInput').value = '';
+                    document.getElementById('longitudeInput').value = '';
+                })
+                .catch(error => {
+                    console.error('Error submitting report:', error);
+                    alert('Error submitting report. Please try again.');
+                });
+            });
+            
+            // Connect to WebSocket for real-time updates
+            const socket = io();
+            
+            socket.on('connect', function() {
+                console.log('Connected to WebSocket server');
+            });
+            
+            socket.on('zone_update', function(data) {
+                console.log('Zone update received:', data);
+                updateZoneOnMap(data);
+            });
+            
+            socket.on('new_photo', function(data) {
+                console.log('New photo received:', data);
+                addPhotoMarker(data);
+            });
+        });
+    </script>
+</body>
+</html>
