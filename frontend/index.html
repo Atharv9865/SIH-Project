@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swachh Bharat - Smart Waste Management</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-leaf text-success me-2"></i>
+                <span class="fw-bold">Swachh Bharat</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="segregation-guide.html">Segregation Guide</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="schedule-pickup.html">Schedule Pickup</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="recycling-centers.html">Recycling Centers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="learn.html">Learn</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-outline-success me-2">Login</button>
+                    <button class="btn btn-success">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-3">Smart Waste Management for Atmanirbhar Bharat</h1>
+                    <p class="lead mb-4">Join the movement towards cleaner, greener Indian cities</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="segregation-guide.html" class="btn btn-success btn-lg">
+                            <i class="fas fa-recycle me-2"></i>Start Segregating
+                        </a>
+                        <a href="schedule-pickup.html" class="btn btn-outline-success btn-lg">
+                            <i class="fas fa-truck me-2"></i>Schedule Pickup
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <img src="https://via.placeholder.com/600x400?text=Clean+India" alt="Clean India" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Cards Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Our Services</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-success bg-opacity-10 text-success rounded-circle mb-3 mx-auto">
+                                <i class="fas fa-trash-alt fa-2x"></i>
+                            </div>
+                            <h3 class="card-title h5">Segregation Guide</h3>
+                            <p class="card-text">Learn how to properly sort your waste into different categories for efficient recycling.</p>
+                            <a href="segregation-guide.html" class="btn btn-sm btn-outline-success mt-3">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-success bg-opacity-10 text-success rounded-circle mb-3 mx-auto">
+                                <i class="fas fa-calendar-alt fa-2x"></i>
+                            </div>
+                            <h3 class="card-title h5">Pickup Schedule</h3>
+                            <p class="card-text">Schedule convenient waste collection from your home or business location.</p>
+                            <a href="schedule-pickup.html" class="btn btn-sm btn-outline-success mt-3">Schedule Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-success bg-opacity-10 text-success rounded-circle mb-3 mx-auto">
+                                <i class="fas fa-map-marker-alt fa-2x"></i>
+                            </div>
+                            <h3 class="card-title h5">Recycling Locator</h3>
+                            <p class="card-text">Find the nearest recycling centers and drop-off points in your area.</p>
+                            <a href="recycling-centers.html" class="btn btn-sm btn-outline-success mt-3">Find Centers</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Our Environmental Impact</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="stat-card text-center p-4">
+                        <h3 class="display-4 fw-bold text-success">1,250</h3>
+                        <p class="text-muted">Tons of Waste Collected</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card text-center p-4">
+                        <h3 class="display-4 fw-bold text-success">450</h3>
+                        <p class="text-muted">Tons Recycled</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card text-center p-4">
+                        <h3 class="display-4 fw-bold text-success">120</h3>
+                        <p class="text-muted">Communities Served</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card text-center p-4">
+                        <h3 class="display-4 fw-bold text-success">5,000</h3>
+                        <p class="text-muted">Trees Saved</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-5 bg-success text-white">
+        <div class="container text-center">
+            <h2 class="mb-4">Ready to Make a Difference?</h2>
+            <p class="lead mb-4">Join thousands of citizens contributing to a cleaner, greener India</p>
+            <button class="btn btn-light btn-lg px-4">Join the Movement</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5><i class="fas fa-leaf me-2"></i>Swachh Bharat</h5>
+                    <p class="text-muted">Smart Waste Management for Atmanirbhar Bharat</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted">Home</a></li>
+                        <li><a href="about.html" class="text-muted">About Us</a></li>
+                        <li><a href="contact.html" class="text-muted">Contact</a></li>
+                        <li><a href="#" class="text-muted">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5>Services</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="segregation-guide.html" class="text-muted">Waste Segregation</a></li>
+                        <li><a href="schedule-pickup.html" class="text-muted">Waste Collection</a></li>
+                        <li><a href="recycling-centers.html" class="text-muted">Recycling Centers</a></li>
+                        <li><a href="learn.html" class="text-muted">Education</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <h5>Newsletter</h5>
+                    <p class="text-muted">Subscribe for updates and tips</p>
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="Your email">
+                        <button class="btn btn-success" type="button">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center text-muted">
+                <p>&copy; 2025 Swachh Bharat - Smart Waste Management. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="app.js"></script>
+</body>
+</html>
