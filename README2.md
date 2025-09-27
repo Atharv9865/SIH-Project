@@ -1,0 +1,71 @@
+# Waste Management Application
+
+A web application for tracking and managing waste collection, recycling, and reporting.
+
+## Setup Instructions
+
+### Prerequisites
+
+1. **Node.js**
+   - Download and install from [nodejs.org](https://nodejs.org/)
+
+2. **Git**
+   - Download and install from [git-scm.com](https://git-scm.com/)
+
+3. **VS Code (Recommended)**
+   - Download and install from [code.visualstudio.com](https://code.visualstudio.com/)
+   - Recommended extensions:
+     - Live Server
+     - Prettier
+     - ES6 Lint
+     - Auto Rename Tag
+     - Thunder Client
+
+### Installation
+
+1. Clone the repository (if using Git):
+   ```
+   git clone <repository-url>
+   cd waste-management-app
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the server:
+   ```
+   npm start
+   ```
+   
+   For development with auto-reload:
+   ```
+   npm run dev
+   ```
+
+4. Access the application:
+   - Open your browser and navigate to `http://localhost:3000`
+
+## Project Structure
+
+- `/frontend` - Contains all client-side code
+  - `index.html` - Main HTML file
+  - `styles.css` - CSS styles
+  - `app.js` - Frontend JavaScript
+
+- `/backend` - Contains server-side code
+  - `server.js` - Express server and API endpoints
+
+## Features
+
+- Dashboard with waste collection statistics
+- Collection schedule management
+- Recycling tracking
+- Reporting system
+
+## Development
+
+To modify the frontend only, you can use the Live Server extension in VS Code to serve the frontend directory.
+
+For full-stack development with API functionality, run the Node.js server using `npm run dev`.
